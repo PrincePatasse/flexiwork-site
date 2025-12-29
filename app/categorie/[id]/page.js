@@ -1,4 +1,4 @@
-import { getDatabase } from '../../../lib/notion'
+import { getDatabase } from '@/lib/notion'
 import Link from 'next/link'
 import BureauCard from './BureauCard'
 
