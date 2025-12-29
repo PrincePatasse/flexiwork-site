@@ -19,6 +19,11 @@ export default async function CategoriePage({ params }) {
   
   const bureaux = results.map((page) => {
     const props = page.properties
+    
+    // Debug: Logger toutes les propriétés
+    console.log('Props disponibles:', Object.keys(props))
+    console.log('Lien visite:', props['Lien visite'])
+    
     return {
       id: page.id,
       nom: props.Nom?.title?.[0]?.plain_text || 'Sans nom',
@@ -30,7 +35,7 @@ export default async function CategoriePage({ params }) {
       disponibilite: props['Disponibilité']?.rich_text?.[0]?.plain_text || '',
       type: props.Type?.rich_text?.[0]?.plain_text || '',
       description: props.Description?.rich_text?.[0]?.plain_text || '',
-      lien_visite: props['Lien visite']?.url || '',
+      lien_visite: props['Lien visite']?.url || props['Lien visite']?.rich_text?.[0]?.plain_text || 'https://meetings.hubspot.com/flexiwork',
     }
   })
 
