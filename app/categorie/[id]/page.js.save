@@ -1,5 +1,6 @@
-import { getDatabase } from '@/lib/notion'
-import Link from 'next/link'
+capacite: props['Capacité']?.number || nullcapacite: 
+props['Capacité']?.number || null,import { getDatabase } from 
+'@/lib/notion' import Link from 'next/link'
 import BureauCard from './BureauCard'
 
 const categoryConfig = {
@@ -32,7 +33,7 @@ export default async function CategoriePage({ params }) {
       photos: photosUrls,
       localisation: props.Localisation?.rich_text?.[0]?.plain_text || '',
       surface: props.Surface?.number || null,
-      capacite: props['Capacité']?.number || null,
+      capacite: props['Capacité']?.rich_text?.[0]?.plain_text || '',
       prix: props.Prix?.number || null,
       disponibilite: props['Disponibilité']?.rich_text?.[0]?.plain_text || '',
       type: props.Type?.rich_text?.[0]?.plain_text || '',
