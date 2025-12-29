@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 export default function BureauCard({ bureau }) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
+  const [modalPhotoIndex, setModalPhotoIndex] = useState(0)
   const [showModal, setShowModal] = useState(false)
   const photos = bureau.photos ? bureau.photos.split(',').map(url => url.trim()) : []
   
@@ -24,9 +25,24 @@ export default function BureauCard({ bureau }) {
     setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length)
   }
 
+  const nextModalPhoto = (e) => {
+    e.stopPropagation()
+    setModalPhotoIndex((prev) => (prev + 1) % photos.length)
+  }
+
+  const prevModalPhoto = (e) => {
+    e.stopPropagation()
+    setModalPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length)
+  }
+
+  const openModal = () => {
+    setModalPhotoIndex(currentPhotoIndex)
+    setShowModal(true)
+  }
+
   return (
     <>
-      <div onClick={() => setShowModal(true)} className="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-100">
+      <div onClick={openModal} className="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-100">
         <div className="relative h-64 bg-gray-200 overflow-hidden">
           {photos.length > 0 ? (
             <>
@@ -122,22 +138,22 @@ export default function BureauCard({ bureau }) {
             <div className="relative h-96 bg-gray-200">
               {photos.length > 0 ? (
                 <>
-                  <img src={photos[currentPhotoIndex]} alt={bureau.nom} className="w-full h-full object-cover" />
+                  <img src={photos[modalPhotoIndex]} alt={bureau.nom} className="w-full h-full object-cover" />
                   {photos.length > 1 && (
                     <>
-                      <button onClick={prevPhoto} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all">
+                      <button onClick={prevModalPhoto} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all">
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                       </button>
-                      <button onClick={nextPhoto} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all">
+                      <button onClick={nextModalPhoto} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all">
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </button>
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                         {photos.map((_, idx) => (
-                          <div key={idx} className={`w-3 h-3 rounded-full ${idx === currentPhotoIndex ? 'bg-white' : 'bg-white/50'}`} />
+                          <div key={idx} className={`w-3 h-3 rounded-full ${idx === modalPhotoIndex ? 'bg-white' : 'bg-white/50'}`} />
                         ))}
                       </div>
                     </>
