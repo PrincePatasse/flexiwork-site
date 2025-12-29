@@ -1,54 +1,77 @@
 'use client'
 import { useState } from 'react'
-export default function BureauCard({ bureau, meta, index }) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+
+export default function BureauCard({ bureau, onClick }) {
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
+  const photos = bureau.photos ? bureau.photos.split(',').map(url => url.trim()) : []
+  
+  const formatPrice = (price) => {
+    if (!price) return 'Prix sur demande'
+    return new Intl.NumberFormat('fr-FR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price) + ' € HT'
+  }
+
+  const nextPhoto = (e) => {
+    e.stopPropagation()
+    setCurrentPhotoIndex((prev) => (prev + 1) % photos.length)
+  }
+
+  const prevPhoto = (e) => {
+    e.stopPropagation()
+    setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length)
+  }
+
   return (
-    <>
-      <div onClick={() => setIsModalOpen(true)} className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 cursor-pointer animate-fadeInUp" style={{ animationDelay: `${index * 0.1}s` }}>
-        <div className="h-52 bg-gradient-to-br from-gray-100 to-gray-200 relative">
-          {bureau.photos ? (<img src={bureau.photos} alt={bureau.nom} className="w-full h-full object-cover" />) : (<div className="w-full h-full flex items-center justify-center text-6xl">{meta.icon}</div>)}
-          {bureau.disponibilite && (<div className="absolute top-4 right-4 bg-success text-white px-4 py-2 rounded-full text-sm font-bold">{bureau.disponibilite}</div>)}
-        </div>
-        <div className="p-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-3">{bureau.nom}</h3>
-          {bureau.localisation && (<p className="text-sm text-gray-600 mb-2">📍 {bureau.localisation}</p>)}
-          <div className="flex gap-4 mb-3">
-            {bureau.surface > 0 && (<span className="text-sm text-gray-600">📏 {bureau.surface}m²</span>)}
-            {bureau.capacite && (<span className="text-sm text-gray-600">👥 {bureau.capacite}</span>)}
+    <div onClick={onClick} className="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-100">
+      <div className="relative h-64 bg-gray-200 overflow-hidden">
+        {photos.length > 0 ? (
+          <>
+            <img src={photos[currentPhotoIndex]} alt={bureau.nom} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            {photos.length > 1 && (
+              <>
+                <button onClick={prevPhoto} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <button onClick={nextPhoto} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                </button>
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                  {photos.map((_, idx) => (
+                    <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentPhotoIndex ? 'bg-white' : 'bg-white/50'}`} />
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"><span className="text-6xl">🏢</span></div>
+        )}
+        {bureau.disponibilite && (
+          <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">{bureau.disponibilite}</div>
+        )}
+      </div>
+      <div className="p-6">
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-1">{bureau.nom}</h3>
+            {bureau.localisation && (<p className="text-sm text-gray-500 flex items-center"><svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>{bureau.localisation}</p>)}
           </div>
-          {bureau.description && (<p className="text-sm text-gray-700 mb-4 line-clamp-3">{bureau.description}</p>)}
-          {bureau.prix > 0 && (<p className="text-2xl font-black text-gray-900 mb-4">{bureau.prix}€<span className="text-sm font-normal text-gray-500">/mois</span></p>)}
-          {bureau.type && (<span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold mb-4">{bureau.type}</span>)}
-          <button onClick={(e) => { e.stopPropagation(); window.open(bureau.lienVisite, '_blank') }} className="block w-full text-center bg-primary text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-600 transition-colors">📅 Réserver une visite</button>
+        </div>
+        <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
+          {bureau.surface && (<div className="flex items-center text-gray-600"><svg className="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg><span className="font-medium">{bureau.surface} m²</span></div>)}
+          {bureau.type && (<div className="flex items-center text-gray-600"><svg className="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg><span className="font-medium">{bureau.type}</span></div>)}
+        </div>
+        {bureau.description && (<p className="text-gray-600 text-sm mb-4 line-clamp-2">{bureau.description}</p>)}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div>
+            <p className="text-3xl font-bold text-primary">{formatPrice(bureau.prix)}</p>
+            {bureau.prix && <p className="text-xs text-gray-500">par mois</p>}
+          </div>
+          <button className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-semibold transition-colors">Voir détails</button>
         </div>
       </div>
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={() => setIsModalOpen(false)}>
-          <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="relative">
-              <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 z-10 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors">✕</button>
-              {bureau.photos ? (<img src={bureau.photos} alt={bureau.nom} className="w-full h-96 object-cover rounded-t-3xl" />) : (<div className="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-3xl flex items-center justify-center text-8xl">{meta.icon}</div>)}
-              {bureau.disponibilite && (<div className="absolute bottom-4 right-4 bg-success text-white px-6 py-3 rounded-full text-base font-bold shadow-lg">{bureau.disponibilite}</div>)}
-            </div>
-            <div className="p-8">
-              <h2 className="text-4xl font-black text-gray-900 mb-6">{bureau.nom}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                {bureau.localisation && (<div className="flex items-start gap-3"><span className="text-2xl">📍</span><div><p className="text-sm font-semibold text-gray-500 uppercase">Localisation</p><p className="text-lg text-gray-900">{bureau.localisation}</p></div></div>)}
-                {bureau.surface > 0 && (<div className="flex items-start gap-3"><span className="text-2xl">📏</span><div><p className="text-sm font-semibold text-gray-500 uppercase">Surface</p><p className="text-lg text-gray-900">{bureau.surface}m²</p></div></div>)}
-                {bureau.capacite && (<div className="flex items-start gap-3"><span className="text-2xl">👥</span><div><p className="text-sm font-semibold text-gray-500 uppercase">Capacité</p><p className="text-lg text-gray-900">{bureau.capacite}</p></div></div>)}
-                {bureau.type && (<div className="flex items-start gap-3"><span className="text-2xl">🏢</span><div><p className="text-sm font-semibold text-gray-500 uppercase">Type</p><p className="text-lg text-gray-900">{bureau.type}</p></div></div>)}
-              </div>
-              {bureau.description && (<div className="mb-8"><h3 className="text-xl font-bold text-gray-900 mb-3">Description</h3><p className="text-base text-gray-700 leading-relaxed">{bureau.description}</p></div>)}
-              <div className="border-t-2 border-gray-200 pt-8 mt-8">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                  {bureau.prix > 0 && (<div><p className="text-4xl font-black text-primary">{bureau.prix}€<span className="text-xl font-normal text-gray-500">/mois</span></p></div>)}
-                  <a href={bureau.lienVisite} target="_blank" rel="noopener noreferrer" className="w-full md:w-auto bg-primary text-white font-bold py-4 px-8 rounded-xl hover:bg-blue-600 transition-colors text-center text-lg shadow-lg">📅 Réserver une visite</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   )
 }
