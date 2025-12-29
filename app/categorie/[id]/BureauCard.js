@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 
+
 export default function BureauCard({ bureau }) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
   const [modalPhotoIndex, setModalPhotoIndex] = useState(0)
