@@ -20,14 +20,16 @@ export default async function CategoriePage({ params }) {
   const bureaux = results.map((page) => {
     const props = page.properties
     
-    // Debug: Logger toutes les propriétés
-    console.log('Props disponibles:', Object.keys(props))
-    console.log('Lien visite:', props['Lien visite'])
+    // Récupérer les URLs des photos depuis le champ "Files & media"
+    const photosFiles = props.Photos?.files || []
+    const photosUrls = photosFiles.map(file => 
+      file.file?.url || file.external?.url || file.name
+    ).filter(Boolean).join(',')
     
     return {
       id: page.id,
       nom: props.Nom?.title?.[0]?.plain_text || 'Sans nom',
-      photos: props.Photos?.url || props.Photos?.rich_text?.[0]?.plain_text || '',
+      photos: photosUrls,
       localisation: props.Localisation?.rich_text?.[0]?.plain_text || '',
       surface: props.Surface?.number || null,
       capacite: props['Capacité']?.rich_text?.[0]?.plain_text || '',
