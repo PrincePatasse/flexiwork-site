@@ -6,11 +6,28 @@ import { track } from "@/lib/mixpanel"
 
 export default function Home() {
   useEffect(() => {
-    track("Page View", { page: "Accueil" })
+    // Capture UTM parameters from URL
+    const params = new URLSearchParams(window.location.search)
+    const utmSource = params.get('utm_source')
+    const utmCampaign = params.get('utm_campaign')
+    const utmContent = params.get('utm_content')
+    
+    const utmParams = {}
+    if (utmSource) utmParams.utm_source = utmSource
+    if (utmCampaign) utmParams.utm_campaign = utmCampaign
+    if (utmContent) utmParams.utm_content = utmContent
+    
+    // Save UTM to localStorage for future events
+    if (Object.keys(utmParams).length > 0) {
+      localStorage.setItem('utm_params', JSON.stringify(utmParams))
+    }
+    
+    track("Page View", { page: "Accueil", ...utmParams })
   }, [])
 
   const handleCategoryClick = (category) => {
-    track("Category Click", { category_id: category.id, category_name: category.title })
+    const savedUtm = JSON.parse(localStorage.getItem('utm_params') || '{}')
+    track("Category Click", { category_id: category.id, category_name: category.title, ...savedUtm })
   }
 
   const categories = [
