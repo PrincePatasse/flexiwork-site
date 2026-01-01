@@ -3,10 +3,10 @@ import Link from 'next/link'
 import BureauCard from './BureauCard'
 
 const categoryConfig = {
-  prestation: { dbId: process.env.NOTION_DB_PRESTATION, title: 'Prestation de Services' },
-  bail: { dbId: process.env.NOTION_DB_BAIL, title: 'Bail 3/6/9' },
-  'sous-location': { dbId: process.env.NOTION_DB_SOUS_LOCATION, title: 'Sous-location' },
-  acquisition: { dbId: process.env.NOTION_DB_ACQUISITION, title: 'Acquisition' },
+  prestation: { dbId: process.env.NOTION_DB_PRESTATION, title: 'Prestation de Services', icon: '🏢' },
+  bail: { dbId: process.env.NOTION_DB_BAIL, title: 'Bail 3/6/9', icon: '📋' },
+  'sous-location': { dbId: process.env.NOTION_DB_SOUS_LOCATION, title: 'Sous-location', icon: '🔄' },
+  acquisition: { dbId: process.env.NOTION_DB_ACQUISITION, title: 'Acquisition', icon: '🏛️' },
 }
 
 export default async function CategoriePage({ params }) {
@@ -26,6 +26,13 @@ export default async function CategoriePage({ params }) {
       file.file?.url || file.external?.url || file.name
     ).filter(Boolean).join(',')
     
+    // Récupérer les Prestations (Multi-select)
+    const prestationsData = props.Prestations?.multi_select || []
+    const prestations = prestationsData.map(p => ({
+      name: p.name,
+      color: p.color
+    }))
+    
     return {
       id: page.id,
       nom: props.Nom?.title?.[0]?.plain_text || 'Sans nom',
@@ -37,9 +44,12 @@ export default async function CategoriePage({ params }) {
       disponibilite: props['Disponibilité']?.rich_text?.[0]?.plain_text || '',
       type: props.Type?.rich_text?.[0]?.plain_text || '',
       description: props.Description?.rich_text?.[0]?.plain_text || '',
-      lien_visite: props['Lien visite']?.url || props['Lien visite']?.rich_text?.[0]?.plain_text || 'https://meetings.hubspot.com/flexiwork',
+      lienVisite: props['Lien visite']?.url || props['Lien visite']?.rich_text?.[0]?.plain_text || 'https://meetings.hubspot.com/flexiwork',
+      prestations: prestations,
     }
   })
+
+  const meta = { icon: config.icon }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -53,8 +63,8 @@ export default async function CategoriePage({ params }) {
           <p className="text-gray-500 text-center py-12">Aucun bureau disponible pour le moment.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {bureaux.map((bureau) => (
-              <BureauCard key={bureau.id} bureau={bureau} />
+            {bureaux.map((bureau, index) => (
+              <BureauCard key={bureau.id} bureau={bureau} meta={meta} index={index} />
             ))}
           </div>
         )}
