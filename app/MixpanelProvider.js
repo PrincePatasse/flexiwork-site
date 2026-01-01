@@ -1,18 +1,44 @@
 'use client'
 
 import { useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { initMixpanel, track } from '@/lib/mixpanel'
+import mixpanel from 'mixpanel-browser'
 
 export default function MixpanelProvider() {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     initMixpanel()
+    
+    // Capture UTM parameters
+    const utmSource = searchParams.get('utm_source')
+    const utmMedium = searchParams.get('utm_medium')
+    const utmCampaign = searchParams.get('utm_campaign')
+    const utmContent = searchParams.get('utm_content')
+    const utmTerm = searchParams.get('utm_term')
+    
+    const utmParams = {}
+    if (utmSource) utmParams.utm_source = utmSource
+    if (utmMedium) utmParams.utm_medium = utmMedium
+    if (utmCampaign) utmParams.utm_campaign = utmCampaign
+    if (utmContent) utmParams.utm_content = utmContent
+    if (utmTerm) utmParams.utm_term = utmTerm
+    
+    // Register UTM params to be sent with all future events
+    if (Object.keys(utmParams).length > 0) {
+      mixpanel.register(utmParams)
+    }
+    
+    // Identify prospect if utm_content contains their name/email
+    if (utmContent) {
+      mixpanel.identify(utmContent)
+    }
+    
     track('Session Start', { 
-      entry_page: window.location.pathname,
-      referrer: document.referrer || 'direct',
-      timestamp: new Date().toISOString()
+      entry_page: pathname,
+      ...utmParams
     })
   }, [])
 
