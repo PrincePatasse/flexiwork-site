@@ -6,7 +6,6 @@ import { track } from "@/lib/mixpanel"
 
 export default function Home() {
   useEffect(() => {
-    // Capture UTM parameters from URL
     const params = new URLSearchParams(window.location.search)
     const utmSource = params.get('utm_source')
     const utmCampaign = params.get('utm_campaign')
@@ -19,7 +18,6 @@ export default function Home() {
     if (utmContent) utmParams.utm_content = utmContent
     if (utmCompany) utmParams.utm_company = utmCompany
     
-    // Save UTM to localStorage for future events
     if (Object.keys(utmParams).length > 0) {
       localStorage.setItem('utm_params', JSON.stringify(utmParams))
     }
