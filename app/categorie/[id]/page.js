@@ -1,6 +1,7 @@
 import { getDatabase } from '@/lib/notion'
 import Link from 'next/link'
 import BureauCard from './BureauCard'
+import CategoryTracker from './CategoryTracker'
 
 const categoryConfig = {
   prestation: { dbId: process.env.NOTION_DB_PRESTATION, title: 'Prestation de Services', icon: '🏢' },
@@ -20,13 +21,11 @@ export default async function CategoriePage({ params }) {
   const bureaux = results.map((page) => {
     const props = page.properties
     
-    // Récupérer les URLs des photos depuis le champ "Files & media"
     const photosFiles = props.Photos?.files || []
     const photosUrls = photosFiles.map(file => 
       file.file?.url || file.external?.url || file.name
     ).filter(Boolean).join(',')
     
-    // Récupérer les Prestations (Multi-select)
     const prestationsData = props.Prestations?.multi_select || []
     const prestations = prestationsData.map(p => ({
       name: p.name,
@@ -44,7 +43,7 @@ export default async function CategoriePage({ params }) {
       disponibilite: props['Disponibilité']?.rich_text?.[0]?.plain_text || '',
       type: props.Type?.rich_text?.[0]?.plain_text || '',
       description: props.Description?.rich_text?.[0]?.plain_text || '',
-      lienVisite: props['Lien visite']?.url || props['Lien visite']?.rich_text?.[0]?.plain_text || 'https://meetings.hubspot.com/flexiwork',
+      lienVisite: props['Lien visite']?.url || props['🗓️ Lien visite']?.url || 'https://meetings.hubspot.com/flexiwork',
       prestations: prestations,
     }
   })
@@ -53,6 +52,7 @@ export default async function CategoriePage({ params }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <CategoryTracker categoryId={id} categoryName={config.title} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <Link href="/" className="inline-flex items-center text-primary hover:underline mb-8">
           ← Retour aux catégories
