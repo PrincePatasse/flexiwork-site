@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { track } from '@/lib/mixpanel'
 
 const colorMap = {
   default: 'bg-gray-100 text-gray-700',
@@ -51,6 +52,22 @@ export default function BureauCard({ bureau, meta, index }) {
   const openModal = () => {
     setModalPhotoIndex(0)
     setShowModal(true)
+    track('Bureau View', {
+      bureau_name: bureau.nom,
+      bureau_price: bureau.prix,
+      bureau_location: bureau.localisation,
+      bureau_surface: bureau.surface
+    })
+  }
+
+  const handleReservationClick = (e) => {
+    e.stopPropagation()
+    track('Reservation Click', {
+      bureau_name: bureau.nom,
+      bureau_price: bureau.prix,
+      bureau_location: bureau.localisation
+    })
+    window.open(bureau.lienVisite || 'https://meetings.hubspot.com/flexiwork', '_blank')
   }
 
   return (
@@ -186,7 +203,7 @@ export default function BureauCard({ bureau, meta, index }) {
                 </div>
               )}
               <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
-                <a href={bureau.lienVisite || 'https://meetings.hubspot.com/flexiwork'} target="_blank" rel="noopener noreferrer" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-colors text-center text-lg shadow-lg">📅 Réserver une visite</a>
+                <button onClick={handleReservationClick} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-colors text-center text-lg shadow-lg">📅 Réserver une visite</button>
               </div>
             </div>
           </div>
