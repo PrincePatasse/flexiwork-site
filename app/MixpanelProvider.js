@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { initMixpanel, track } from '@/lib/mixpanel'
 import mixpanel from 'mixpanel-browser'
 
-export default function MixpanelProvider() {
+function MixpanelTracker() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -60,4 +60,12 @@ export default function MixpanelProvider() {
   }, [pathname])
 
   return null
+}
+
+export default function MixpanelProvider() {
+  return (
+    <Suspense fallback={null}>
+      <MixpanelTracker />
+    </Suspense>
+  )
 }
