@@ -18,7 +18,7 @@ export default function BureauCard({ bureau, meta, index }) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
   const [modalPhotoIndex, setModalPhotoIndex] = useState(0)
   const [showModal, setShowModal] = useState(false)
-  const photos = bureau.photos ? bureau.photos.split(',').map(url => url.trim()) : []
+  const photos = bureau.photos ? bureau.photos.split(',').map(url => url.trim()).filter(Boolean) : []
 
   const formatPrice = (price) => {
     if (!price) return 'Prix sur demande'
@@ -59,16 +59,21 @@ export default function BureauCard({ bureau, meta, index }) {
         <div className="relative h-64 bg-gray-200 overflow-hidden">
           {photos.length > 0 ? (
             <>
-              <img src={photos[currentPhotoIndex]} alt={bureau.nom} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <img 
+                src={photos[currentPhotoIndex]} 
+                alt={bureau.nom} 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading={index < 3 ? "eager" : "lazy"}
+              />
               {photos.length > 1 && (
                 <>
-                  <button onClick={prevPhoto} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg">
+                  <button onClick={prevPhoto} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg z-10">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                   </button>
-                  <button onClick={nextPhoto} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg">
+                  <button onClick={nextPhoto} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg z-10">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                   </button>
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
                     {photos.map((_, idx) => (
                       <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentPhotoIndex ? 'bg-white' : 'bg-white/50'}`} />
                     ))}
@@ -80,7 +85,7 @@ export default function BureauCard({ bureau, meta, index }) {
             <div className="w-full h-full flex items-center justify-center text-6xl bg-gradient-to-br from-blue-50 to-blue-100">🏢</div>
           )}
           {bureau.disponibilite && (
-            <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">{bureau.disponibilite}</div>
+            <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium z-10">{bureau.disponibilite}</div>
           )}
         </div>
         <div className="p-5">
@@ -102,26 +107,30 @@ export default function BureauCard({ bureau, meta, index }) {
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
           <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="relative">
-              <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 z-10 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-gray-100">✕</button>
+              <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 z-20 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-gray-100">✕</button>
               {photos.length > 0 ? (
-                <div className="relative h-80 md:h-96">
-                  <img src={photos[modalPhotoIndex]} alt={bureau.nom} className="w-full h-full object-cover" />
+                <div className="relative h-80 md:h-96 bg-gray-100">
+                  <img 
+                    src={photos[modalPhotoIndex]} 
+                    alt={bureau.nom} 
+                    className="w-full h-full object-cover"
+                  />
                   {photos.length > 1 && (
                     <>
-                      <button onClick={prevModalPhoto} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg">
+                      <button onClick={prevModalPhoto} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg z-10">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                       </button>
-                      <button onClick={nextModalPhoto} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg">
+                      <button onClick={nextModalPhoto} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg z-10">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                       </button>
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                         {photos.map((_, idx) => (
                           <button key={idx} onClick={(e) => { e.stopPropagation(); setModalPhotoIndex(idx); }} className={`w-3 h-3 rounded-full ${idx === modalPhotoIndex ? 'bg-white' : 'bg-white/50'}`} />
                         ))}
                       </div>
                     </>
                   )}
-                  {bureau.disponibilite && <div className="absolute top-4 left-4 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg">{bureau.disponibilite}</div>}
+                  {bureau.disponibilite && <div className="absolute top-4 left-4 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg z-10">{bureau.disponibilite}</div>}
                 </div>
               ) : (
                 <div className="h-64 bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-8xl">🏢</div>
