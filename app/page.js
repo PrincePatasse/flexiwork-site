@@ -11,11 +11,13 @@ export default function Home() {
     const utmSource = params.get('utm_source')
     const utmCampaign = params.get('utm_campaign')
     const utmContent = params.get('utm_content')
+    const utmCompany = params.get('utm_company')
     
     const utmParams = {}
     if (utmSource) utmParams.utm_source = utmSource
     if (utmCampaign) utmParams.utm_campaign = utmCampaign
     if (utmContent) utmParams.utm_content = utmContent
+    if (utmCompany) utmParams.utm_company = utmCompany
     
     // Save UTM to localStorage for future events
     if (Object.keys(utmParams).length > 0) {
